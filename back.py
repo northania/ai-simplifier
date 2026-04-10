@@ -16,7 +16,8 @@ load_dotenv(".env.local")
 app = FastAPI()
 
 BASE_DIR = Path(__file__).resolve().parent
-FRONTEND_DIR = BASE_DIR / "frontend"
+PUBLIC_DIR = BASE_DIR / "public"
+STATIC_DIR = PUBLIC_DIR / "static"
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,7 +27,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
@@ -102,7 +104,7 @@ def simplify_text(text: str) -> str:
 
 @app.get("/", include_in_schema=False)
 def index():
-    return FileResponse(FRONTEND_DIR / "LexicLand.html")
+    return FileResponse(PUBLIC_DIR / "index.html")
 
 
 @app.get("/health")
