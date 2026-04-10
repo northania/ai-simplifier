@@ -18,6 +18,7 @@ app = FastAPI()
 BASE_DIR = Path(__file__).resolve().parent
 PUBLIC_DIR = BASE_DIR / "public"
 STATIC_DIR = PUBLIC_DIR / "static"
+IS_VERCEL = os.getenv("VERCEL") == "1"
 
 app.add_middleware(
     CORSMiddleware,
@@ -100,9 +101,10 @@ def simplify_text(text: str) -> str:
     return result.strip()
 
 
-@app.get("/", include_in_schema=False)
-def index():
-    return FileResponse(PUBLIC_DIR / "index.html")
+if not IS_VERCEL:
+    @app.get("/", include_in_schema=False)
+    def index():
+        return FileResponse(PUBLIC_DIR / "index.html")
 
 
 @app.get("/health")
