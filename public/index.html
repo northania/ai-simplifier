@@ -90,6 +90,10 @@
             return header ? header.offsetHeight : 0;
         }
 
+        function getViewportGap() {
+            return window.innerWidth <= 960 ? window.innerHeight * 0.72 : window.innerHeight;
+        }
+
         function scrollElementIntoComfortView(element, extraOffset = 0, centerBias = 0.5) {
             if (!element) {
                 return;
@@ -115,7 +119,7 @@
             event.preventDefault();
 
             const inputSection = document.querySelector(".input-text");
-            scrollElementIntoComfortView(inputSection, 0, 0.52);
+            scrollElementIntoComfortView(inputSection, -getViewportGap() * 0.1, 0.5);
         }
 
         function syncResultHeights() {
@@ -209,7 +213,7 @@
 
             const outputBox = document.querySelector(".output-text");
             outputBox.classList.add("show");
-            scrollElementIntoComfortView(document.querySelector(".input-text"), 0, 0.52);
+            scrollElementIntoComfortView(document.querySelector(".input-text"), -getViewportGap() * 0.1, 0.5);
 
             try {
                 const response = await fetch("/simplify", {
@@ -231,7 +235,7 @@
                 syncResultHeights();
                 setTtsStatus("Simplified text is ready to read aloud.");
                 setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), 0, 0.5);
+                    scrollElementIntoComfortView(document.getElementById("result"), -getViewportGap() * 0.06, 0.5);
                 }, 120);
             }
             catch (error) {
@@ -241,7 +245,7 @@
                 syncResultHeights();
                 setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
                 setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), 0, 0.5);
+                    scrollElementIntoComfortView(document.getElementById("result"), -getViewportGap() * 0.06, 0.5);
                 }, 120);
             }
         }
