@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexicLand - AI Simplifier for Dyslexic</title>
+    <link rel="icon" sizes="16x16" href="Group 1.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="content.css">
+</head>
+<body>
+    <header>
+        <img src="Group 1.png" alt="Logo LexicLand" width="60" height="65">
+        <div class = "menu">
+            <a href="LexicLand.html">Home</a>
+        </div>
+    </header>
+    <div class="content">
+        <div class="content-home">
+            <div class="left-home">
+                <h1>LexicLand</h1>
+                <p>AI Text Simplifier for Dyslexia</p>
+
+                <div>
+                    <nav>
+                        <a href="#try">Try It</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="right-home">
+                <img src="LexicLand-Decoration.png" alt="LexicLand Decoration">
+            </div>
+        </div>
+        <div class="main-content" id="try">
+            <div class="input-text">
+                <h3>AI Text Simplifier</h3>
+
+                <div class="input-box">
+                    <textarea id="inputText" placeholder="Insert your text here..."></textarea>
+                    <br><br>
+                    <button onclick="simplifyText()">Simplify Text</button>
+                </div>
+            </div>
+            <div class="output-text" id="result">
+                <div class="before">
+                    <div class="label">Before</div>
+                    <textarea id="before-text" readonly></textarea>
+                </div>
+                <div class="after">
+                    <div class="label">After</div>
+                    <textarea id="after-text" readonly></textarea>
+                    <button onclick="copyText(this)">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll("textarea").forEach(textarea=> {
+            textarea.addEventListener("input", function() {
+                this.style.height = "auto"; // reset
+                this.style.height = this.scrollHeight + "px"; // ikutin jumlah text
+            });
+        });
+
+        async function simplifyText() {
+            const text = document.getElementById("inputText").value;
+
+            if (!text) {
+                alert("Please enter text first!");
+                return;
+            }
+
+            document.getElementById("before-text").value = text;
+            document.getElementById("after-text").value = "Processing...";
+
+            const outputBox = document.querySelector(".output-text");
+            outputBox.classList.add("show");
+
+            document.getElementById("result").scrollIntoView({
+                behavior: "smooth"
+            });
+
+            try {
+                const response = await fetch("http://localhost:8000/simplify", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+                document.getElementById("after-text").value = data.output;
+            }
+            catch (error) {
+                console.error(error);
+                document.getElementById("after-text").value = "Error occured!";
+            }
+        }
+
+         function copyText(btn) {
+            const afterText = document.getElementById("after-text").value;
+            navigator.clipboard.writeText(afterText);
+
+            btn.innerText = "Copied!";
+            setTimeout(() => {
+                btn.innerText = "Copy";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

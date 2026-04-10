@@ -1,0 +1,45 @@
+        * {
+                margin: 0;
+                padding: 0;
+                font-family: 'Lexend Exa', sans-serif;
+                font-optical-sizing: auto;
+                font-weight: 700;
+            }
+
+        header {
+            background-color: #776B5D;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            position: fixed;
+            justify-content: space-between;
+            font-size: large;
+        }
+
+        header img {
+            padding-top: 0;
+            margin-top: 0;
+            padding-left: 40px;
+        }
+
+        header .menu {
+            align-items: center;
+            margin-right : 70px;
+            display: flex;
+        }
+
+        header .menu a{
+            text-decoration: none;
+            color: #EBE3D5;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        header .menu a:hover {
+            background-color: #EBE3D5;
+            color: #776B5D;
+        }
