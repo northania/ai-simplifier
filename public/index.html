@@ -1,79 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"> <!-- encoding karakter -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexicLand - AI Simplifier for Dyslexic</title>
-    <link rel="icon" sizes="16x16" href="/static/Group 1.png">
+    <title>LexicLand - AI Simplifier for Dyslexic</title> <!-- judul tab -->
+    <link rel="icon" sizes="16x16" href="/static/Group 1.png"> <!-- icon website -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/header.css">
-    <link rel="stylesheet" href="/static/content.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100..900&display=swap" rel="stylesheet"> <!-- font -->
+    <link rel="stylesheet" href="/static/header.css"> <!-- CSS header -->
+    <link rel="stylesheet" href="/static/content.css"> <!-- CSS content -->
 </head>
 <body>
     <header>
-        <img src="/static/Group 1.png" alt="Logo LexicLand" width="60" height="65">
+        <img src="/static/Group 1.png" alt="Logo LexicLand" width="60" height="65"> <!-- logo -->
         <div class = "menu">
-            <a href="/">Home</a>
+            <a href="/">Home</a> <!-- menu navigasi -->
         </div>
     </header>
     <div class="content">
         <div class="content-home">
             <div class="left-home">
-                <h1>LexicLand</h1>
+                <h1>LexicLand</h1> <!-- judul -->
                 <p>AI Text Simplifier for Dyslexia</p>
 
                 <div>
                     <nav>
-                        <a href="#try" onclick="scrollToTryIt(event)">Try It</a>
+                        <a href="#try">Try It</a> <!-- scroll ke section input -->
                     </nav>
                 </div>
             </div>
             <div class="right-home">
-                <img src="/static/LexicLand-Decoration.png" alt="LexicLand Decoration">
+                <img src="/static/LexicLand-Decoration.png" alt="LexicLand Decoration"> <!-- gambar -->
             </div>
         </div>
         <div class="main-content" id="try">
             <div class="input-text">
-                <h3>AI Text Simplifier</h3>
+                <h3>AI Text Simplifier</h3> <!-- judul fitur -->
 
                 <div class="input-box">
-                    <textarea id="inputText" placeholder="Insert your text here..."></textarea>
+                    <textarea id="inputText" placeholder="Insert your text here..."></textarea> <!-- input user -->
                     <br><br>
-                    <button onclick="simplifyText()">Simplify Text</button>
+                    <button onclick="simplifyText()">Simplify Text</button> <!-- tombol kirim ke backend -->
                 </div>
             </div>
             <div class="output-text" id="result">
                 <div class="before">
-                    <div class="label">Before</div>
-                    <textarea id="before-text" readonly></textarea>
+                    <div class="label">Before</div> <!-- label input -->
+                    <textarea id="before-text" readonly></textarea> <!-- text asli -->
                 </div>
                 <div class="after">
-                    <div class="label">After</div>
-                    <textarea id="after-text" readonly></textarea>
+                    <div class="label">After</div> <!-- label output -->
+                    <textarea id="after-text" readonly></textarea> <!-- hasil AI -->
+
                     <div class="action-row">
-                        <button onclick="copyText(this)">Copy</button>
-                        <button id="speakButton" onclick="toggleSpeech()">Speak</button>
+                        <button onclick="copyText(this)">Copy</button> <!-- copy hasil -->
+                        <button id="speakButton" onclick="toggleSpeech()">Speak</button> <!-- text to speech -->
                     </div>
-                    <p id="tts-status" class="tts-status">Text-to-speech ready.</p>
+                    <p id="tts-status" class="tts-status">Text-to-speech ready.</p> <!-- status TTS -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentUtterance = null;
-        let isSpeaking = false;
-        const ENGLISH_MARKERS = [
+        let currentUtterance = null; // menyimpan suara TTS
+        let isSpeaking = false; // status apakah sedang berbicara
+
+        // kata umum bahasa Inggris
+        const ENGLISH_MARKERS = [ 
             "the", "and", "is", "are", "to", "of", "in", "for", "with", "on",
             "this", "that", "it", "be", "as", "by", "from", "or", "an", "at"
         ];
+
+        // kata umum bahasa Indonesia
         const INDONESIAN_MARKERS = [
             "yang", "dan", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "adalah",
             "tidak", "pada", "karena", "atau", "juga", "dalam", "akan", "bisa", "sudah", "agar"
         ];
 
+        // auto resize semua textarea
         document.querySelectorAll("textarea").forEach(textarea=> {
             textarea.addEventListener("input", function() {
                 autoResize(this);
@@ -81,48 +87,12 @@
         });
 
         function autoResize(textarea) {
-            textarea.style.height = "auto";
-            textarea.style.height = textarea.scrollHeight + "px";
-        }
-
-        function getHeaderOffset() {
-            const header = document.querySelector("header");
-            return header ? header.offsetHeight : 0;
-        }
-
-        function getViewportGap() {
-            return window.innerWidth <= 960 ? window.innerHeight * 0.72 : window.innerHeight;
-        }
-
-        function scrollElementIntoComfortView(element, extraOffset = 0, centerBias = 0.5) {
-            if (!element) {
-                return;
-            }
-
-            const headerOffset = getHeaderOffset();
-            const elementRect = element.getBoundingClientRect();
-            const elementTop = window.scrollY + elementRect.top;
-            const elementHeight = elementRect.height;
-            const viewportHeight = window.innerHeight;
-            const usableHeight = viewportHeight - headerOffset;
-            const freeSpace = Math.max(usableHeight - elementHeight, 0);
-            const centeredTop = elementTop - headerOffset - (freeSpace * centerBias);
-            const targetTop = Math.max(centeredTop - extraOffset, 0);
-
-            window.scrollTo({
-                top: targetTop,
-                behavior: "smooth"
-            });
-        }
-
-        function scrollToTryIt(event) {
-            event.preventDefault();
-
-            const inputSection = document.querySelector(".input-text");
-            scrollElementIntoComfortView(inputSection, -getViewportGap() * 0.1, 0.5);
+            textarea.style.height = "auto"; // reset tinggi
+            textarea.style.height = textarea.scrollHeight + "px"; // sesuaikan isi
         }
 
         function syncResultHeights() {
+            
             const resultAreas = [
                 document.getElementById("before-text"),
                 document.getElementById("after-text")
@@ -142,18 +112,22 @@
             });
         }
 
+        // update teks status TTS
         function setTtsStatus(message) {
             document.getElementById("tts-status").innerText = message;
         }
 
+        // ubah teks tombol speak/stop
         function updateSpeakButton() {
             document.getElementById("speakButton").innerText = isSpeaking ? "Stop" : "Speak";
         }
 
+        // hitung kecocokan kata bahasa
         function countLanguageMatches(words, markers) {
             return words.reduce((total, word) => total + (markers.includes(word) ? 1 : 0), 0);
         }
 
+        // deteksi bahasa sederhana
         function detectDominantLanguage(text) {
             const words = text
                 .toLowerCase()
@@ -184,11 +158,13 @@
             };
         }
 
+        // pilih voice sesuai bahasa
         function pickVoice(targetLang) {
             const voices = window.speechSynthesis.getVoices();
             return voices.find((voice) => voice.lang.toLowerCase().startsWith(targetLang.toLowerCase()));
         }
 
+        // fungsi utama integrasi frontend dan backend
         async function simplifyText() {
             const input = document.getElementById("inputText");
             const beforeText = document.getElementById("before-text");
@@ -200,20 +176,24 @@
                 return;
             }
 
+            // stop suara lama
             window.speechSynthesis.cancel();
             isSpeaking = false;
             updateSpeakButton();
             setTtsStatus("Text-to-speech ready.");
 
-            beforeText.value = text;
-            afterText.value = "Processing...";
+            beforeText.value = text; // tampilkan input
+            afterText.value = "Processing..."; // loading
             autoResize(beforeText);
             autoResize(afterText);
             syncResultHeights();
 
             const outputBox = document.querySelector(".output-text");
-            outputBox.classList.add("show");
-            scrollElementIntoComfortView(document.querySelector(".input-text"), -getViewportGap() * 0.1, 0.5);
+            outputBox.classList.add("show"); // tampilkan output
+
+            document.getElementById("result").scrollIntoView({
+                behavior: "smooth" 
+            });
 
             try {
                 const response = await fetch("/simplify", {
@@ -230,13 +210,10 @@
                 }
 
                 const data = await response.json();
-                afterText.value = data.simplified_text;
+                afterText.value = data.simplified_text; // tampilkan hasil
                 autoResize(afterText);
                 syncResultHeights();
                 setTtsStatus("Simplified text is ready to read aloud.");
-                setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), -getViewportGap() * 0.06, 0.5);
-                }, 120);
             }
             catch (error) {
                 console.error(error);
@@ -244,12 +221,10 @@
                 autoResize(afterText);
                 syncResultHeights();
                 setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
-                setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), -getViewportGap() * 0.06, 0.5);
-                }, 120);
             }
         }
 
+        // copy hasil ke clipboard
         function copyText(btn) {
             const afterText = document.getElementById("after-text").value;
 
@@ -265,6 +240,7 @@
             }, 1500);
         }
 
+        // text-to-speech
         function toggleSpeech() {
             const output = document.getElementById("after-text").value.trim();
 
@@ -327,8 +303,8 @@
                 window.speechSynthesis.getVoices();
             };
         }
-
-        window.addEventListener("resize", syncResultHeights);
+        
+        window.addEventListener("resize", syncResultHeights); // responsive height
     </script>
 </body>
 </html>

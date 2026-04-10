@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"> <!-- encoding karakter -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexicLand - AI Simplifier for Dyslexic</title>
     <link rel="icon" sizes="16x16" href="/static/Group 1.png">
+
+    <!-- load font dari google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- css -->
     <link rel="stylesheet" href="/static/header.css">
     <link rel="stylesheet" href="/static/content.css">
 </head>
 <body>
+    <!-- navbar -->
     <header>
         <img src="/static/Group 1.png" alt="Logo LexicLand" width="60" height="65">
         <div class = "menu">
@@ -19,31 +24,42 @@
         </div>
     </header>
     <div class="content">
+        <!-- landing section -->
         <div class="content-home">
             <div class="left-home">
                 <h1>LexicLand</h1>
                 <p>AI Text Simplifier for Dyslexia</p>
-
+                
+                <!-- tombol scroll ke section try -->
                 <div>
                     <nav>
-                        <a href="#try" onclick="scrollToTryIt(event)">Try It</a>
+                        <a href="#try">Try It</a>
                     </nav>
                 </div>
             </div>
+
+            <!-- gambar dekorasi -->
             <div class="right-home">
                 <img src="/static/LexicLand-Decoration.png" alt="LexicLand Decoration">
             </div>
         </div>
+
+        <!-- section AI -->
         <div class="main-content" id="try">
             <div class="input-text">
                 <h3>AI Text Simplifier</h3>
 
                 <div class="input-box">
+                    <!-- input teks -->
                     <textarea id="inputText" placeholder="Insert your text here..."></textarea>
                     <br><br>
+
+                    <!-- tombol kirim ke backend -->
                     <button onclick="simplifyText()">Simplify Text</button>
                 </div>
             </div>
+
+            <!-- hasil -->
             <div class="output-text" id="result">
                 <div class="before">
                     <div class="label">Before</div>
@@ -52,10 +68,14 @@
                 <div class="after">
                     <div class="label">After</div>
                     <textarea id="after-text" readonly></textarea>
+
+                    <!-- tombol aksi -->
                     <div class="action-row">
                         <button onclick="copyText(this)">Copy</button>
                         <button id="speakButton" onclick="toggleSpeech()">Speak</button>
                     </div>
+
+                    <!-- status text to speech -->
                     <p id="tts-status" class="tts-status">Text-to-speech ready.</p>
                 </div>
             </div>
@@ -63,17 +83,22 @@
     </div>
 
     <script>
-        let currentUtterance = null;
-        let isSpeaking = false;
+        let currentUtterance = null; // object speech aktif
+        let isSpeaking = false; // status sedang membaca
+
+        // kata penanda bahasa Inggris
         const ENGLISH_MARKERS = [
             "the", "and", "is", "are", "to", "of", "in", "for", "with", "on",
             "this", "that", "it", "be", "as", "by", "from", "or", "an", "at"
         ];
+
+        // kata penanda bahasa Indonesia
         const INDONESIAN_MARKERS = [
             "yang", "dan", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "adalah",
             "tidak", "pada", "karena", "atau", "juga", "dalam", "akan", "bisa", "sudah", "agar"
         ];
 
+        // auto resize textarea saat input
         document.querySelectorAll("textarea").forEach(textarea=> {
             textarea.addEventListener("input", function() {
                 autoResize(this);
@@ -85,43 +110,7 @@
             textarea.style.height = textarea.scrollHeight + "px";
         }
 
-        function getHeaderOffset() {
-            const header = document.querySelector("header");
-            return header ? header.offsetHeight : 0;
-        }
-
-        function getViewportGap() {
-            return window.innerWidth <= 960 ? window.innerHeight * 0.72 : window.innerHeight;
-        }
-
-        function scrollElementIntoComfortView(element, extraOffset = 0, centerBias = 0.5) {
-            if (!element) {
-                return;
-            }
-
-            const headerOffset = getHeaderOffset();
-            const elementRect = element.getBoundingClientRect();
-            const elementTop = window.scrollY + elementRect.top;
-            const elementHeight = elementRect.height;
-            const viewportHeight = window.innerHeight;
-            const usableHeight = viewportHeight - headerOffset;
-            const freeSpace = Math.max(usableHeight - elementHeight, 0);
-            const centeredTop = elementTop - headerOffset - (freeSpace * centerBias);
-            const targetTop = Math.max(centeredTop - extraOffset, 0);
-
-            window.scrollTo({
-                top: targetTop,
-                behavior: "smooth"
-            });
-        }
-
-        function scrollToTryIt(event) {
-            event.preventDefault();
-
-            const inputSection = document.querySelector(".input-text");
-            scrollElementIntoComfortView(inputSection, -getViewportGap() * 0.1, 0.5);
-        }
-
+        // samakan tinggi before & after
         function syncResultHeights() {
             const resultAreas = [
                 document.getElementById("before-text"),
@@ -142,14 +131,17 @@
             });
         }
 
+        // update status TTS
         function setTtsStatus(message) {
             document.getElementById("tts-status").innerText = message;
         }
 
+        // ubah teks tombol speak/stop
         function updateSpeakButton() {
             document.getElementById("speakButton").innerText = isSpeaking ? "Stop" : "Speak";
         }
 
+        // hitung kemunculan kata bahasa
         function countLanguageMatches(words, markers) {
             return words.reduce((total, word) => total + (markers.includes(word) ? 1 : 0), 0);
         }
@@ -184,11 +176,13 @@
             };
         }
 
+        // pilih suara sesuai bahasa
         function pickVoice(targetLang) {
             const voices = window.speechSynthesis.getVoices();
             return voices.find((voice) => voice.lang.toLowerCase().startsWith(targetLang.toLowerCase()));
         }
 
+        // kirim teks ke backend
         async function simplifyText() {
             const input = document.getElementById("inputText");
             const beforeText = document.getElementById("before-text");
@@ -213,9 +207,13 @@
 
             const outputBox = document.querySelector(".output-text");
             outputBox.classList.add("show");
-            scrollElementIntoComfortView(document.querySelector(".input-text"), -getViewportGap() * 0.1, 0.5);
+
+            document.getElementById("result").scrollIntoView({
+                behavior: "smooth"
+            });
 
             try {
+                // request ke API backend
                 const response = await fetch("/simplify", {
                     method: "POST",
                     headers: {
@@ -234,9 +232,6 @@
                 autoResize(afterText);
                 syncResultHeights();
                 setTtsStatus("Simplified text is ready to read aloud.");
-                setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), -getViewportGap() * 0.06, 0.5);
-                }, 120);
             }
             catch (error) {
                 console.error(error);
@@ -244,12 +239,10 @@
                 autoResize(afterText);
                 syncResultHeights();
                 setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
-                setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), -getViewportGap() * 0.06, 0.5);
-                }, 120);
             }
         }
 
+        // copy hasil
         function copyText(btn) {
             const afterText = document.getElementById("after-text").value;
 
@@ -265,6 +258,7 @@
             }, 1500);
         }
 
+        // toggle text to speech
         function toggleSpeech() {
             const output = document.getElementById("after-text").value.trim();
 

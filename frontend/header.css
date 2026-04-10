@@ -1,45 +1,45 @@
-        * {
-                margin: 0;
-                padding: 0;
-                font-family: 'Lexend Exa', sans-serif;
-                font-optical-sizing: auto;
-                font-weight: 700;
+* {
+            margin: 0; /* hapus margin default semua elemen */
+            padding: 0; /* hapus padding default */
+            font-family: 'Lexend Exa', sans-serif; /* font utama */
+            font-optical-sizing: auto; /* optimasi ukuran optik font */
+            font-weight: 700; /* ketebalan font default */
             }
 
         header {
-            background-color: #776B5D;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            display: flex;
-            position: fixed;
-            justify-content: space-between;
-            font-size: large;
+            background-color: #776B5D; /* warna navbar */
+            top: 0; /* posisikan di atas */
+            left: 0; /* full dari kiri */
+            right: 0; /* full sampai kanan */
+            height: 70px; /* tinggi navbar */
+            display: flex; /* layout flex */
+            position: fixed; /* navbar tetap saat scroll */
+            justify-content: space-between; /* isi kiri & kanan */
+            font-size: large; /* ukuran teks */
         }
 
         header img {
-            padding-top: 0;
-            margin-top: 0;
-            padding-left: 40px;
+            padding-top: 0; /* tanpa jarak atas */
+            margin-top: 0; /* tanpa margin atas */
+            padding-left: 40px; /* jarak kiri logo */
         }
 
         header .menu {
-            align-items: center;
-            margin-right : 70px;
-            display: flex;
+            align-items: center; /* rata tengah vertikal */
+            margin-right : 70px; /* jarak kanan */
+            display: flex; /* menu horizontal */
         }
 
         header .menu a{
-            text-decoration: none;
-            color: #EBE3D5;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 20px;
-            font-weight: 700;
+            text-decoration: none; /* hilangkan garis link */
+            color: #EBE3D5; /* warna teks */
+            padding: 10px 20px; /* ruang dalam link */
+            border-radius: 5px; /* sudut membulat */
+            font-size: 20px; /* ukuran teks */
+            font-weight: 700; /* teks tebal */
         }
 
         header .menu a:hover {
-            background-color: #EBE3D5;
-            color: #776B5D;
+            background-color: #EBE3D5; /* warna saat hover */
+            color: #776B5D; /* warna teks saat hover */
         }

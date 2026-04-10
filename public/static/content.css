@@ -1,12 +1,13 @@
 * {
-    scroll-behavior: smooth;
+    scroll-behavior: smooth; /* membuat scroll halaman halus */
 
 }
 
 body {
-    background-color: #F3EEEA;
+    background-color: #F3EEEA; /* background utama website */
 }
 
+/* container utama konten */
 .content {
     /* display: flex; */
     margin-left: 90px;
@@ -14,6 +15,7 @@ body {
     /* flex-direction: column; */
 }
 
+/* section home */
 .content-home {
     display: flex;
     min-height: 560px;
@@ -28,6 +30,7 @@ body {
     padding-bottom: 30px;
 }
 
+/* sisi kiri home */
 .content-home .left-home {
     width: 70%;
     display: flex;
@@ -36,10 +39,12 @@ body {
     justify-content: center;
 }
 
+/* judul */
 .content-home .left-home h1 {
     color: #776B5D;
 }
 
+/* deskripsi */
 .content-home .left-home p {
     color: #776B5D;
     font-size: 25px;
@@ -49,6 +54,7 @@ body {
     flex: 1;
 }
 
+/* tombol navigasi "Try It" */
 .content-home .left-home nav {
     display: flex;
     margin-top: 44px;
@@ -59,6 +65,7 @@ body {
     z-index: 1;
 }
 
+/* link tombol */
 .content-home .left-home nav a {
     text-decoration: none;
     border-radius: 50px;
@@ -70,10 +77,12 @@ body {
     width: fit-content;
 }
 
+/* hover tombol */
 .content-home .left-home nav a:hover {
     background-color: #9e968c;
 }
 
+/* sisi kanan home (gambar) */
 .content-home .right-home {
     width: 100%;
     margin-top: 70px;
@@ -83,6 +92,7 @@ body {
     align-items: center;
 }
 
+/* gambar home */
 .content-home .right-home img {
     width: 70%;
     max-width: 520px;
@@ -94,25 +104,29 @@ body {
     border: 3px solid red; 
 } */
 
+/* section input-output utama */
 .main-content {
-    margin-top: 100vh;
+    /* top: 700px; */
+    margin-top: 8px;
     margin-left: auto;
     margin-right: auto;
     max-width: 1400px;
-    scroll-margin-top: 110px;
-    padding-top: 0;
-    padding-bottom: 25vh;
+    scroll-margin-top: 150px;
     min-height: auto;
+    /* height: 1000px; */
+    /* z-index: -1; */
 }
 
+/* judul fitur */
 .main-content h3 {
-    margin-top: 0;
+    margin-top: 50px;
     margin-bottom: 20px;
     font-size: 30px;
     font-weight: 600;
     color: #776B5D;
 }
 
+/* textarea input */
 .input-text .input-box textarea {
     width: 100%;
     min-height: 150px;
@@ -125,10 +139,12 @@ body {
     border: none;
 }
 
+/* placeholder text */
 textarea::placeholder {
     color: black;
 }
 
+/* tombol simplify */
 .input-text .input-box button {
     padding: 15px;
     margin-top: -10px;
@@ -141,10 +157,12 @@ textarea::placeholder {
     cursor: pointer;
 }
 
+/* hover tombol */
 .input-text .input-box button:hover {
     background-color: #9e968c;
 }
 
+/* output area (before & after) */
 .main-content .output-text {
     display: none;
     margin-top: 30px;
@@ -153,21 +171,25 @@ textarea::placeholder {
     gap: 20px;
 }
 
+/* tampilkan output */
 .main-content .output-text.show {
     display: grid;
     opacity: 1;
 }
 
+/* box before & after */
 .main-content .output-text .before, .after {
     padding: 20px;
 }
 
+/* label before/after */
 .output-text .label {
     color: #776B5D;
     font-size: 20px;
     margin-bottom: 10px;
 }
 
+/* textarea output */
 .output-text textarea {
     width: 100%;
     min-height: 200px;
@@ -182,6 +204,7 @@ textarea::placeholder {
     box-sizing: border-box;
 }
 
+/* tombol copy & speak */
 .after button {
     margin-top: 10px;
     padding: 10px;
@@ -192,16 +215,19 @@ textarea::placeholder {
     border: none;
 }
 
+/* hover tombol action */
 .after button:hover {
     background-color: #9e968c;
 }
 
+/* layout tombol action */
 .action-row {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
 }
 
+/* status text-to-speech */
 .tts-status {
     margin-top: 12px;
     color: #776B5D;
@@ -209,12 +235,16 @@ textarea::placeholder {
     line-height: 1.5;
 }
 
+/* responsive design */
 @media (max-width: 960px) {
+
+    /* kecilkan margin di mobile */
     .content {
         margin-left: 24px;
         margin-right: 24px;
     }
 
+    /* ubah layout jadi vertikal */
     .content-home {
         height: auto;
         min-height: auto;
@@ -224,35 +254,36 @@ textarea::placeholder {
         padding-bottom: 16px;
     }
 
+    /* full width di mobile */
     .content-home .left-home,
     .content-home .right-home {
         width: 100%;
     }
 
+    /* resize teks judul */
     .content-home .left-home h1 {
         font-size: 56px;
     }
 
+    /* resize teks */
     .content-home .left-home p,
     .content-home .left-home nav a {
         font-size: 20px;
     }
 
+    /* center gambar */
     .content-home .right-home {
         margin-top: 0;
         justify-content: center;
     }
 
+    /* gambar responsif */
     .content-home .right-home img {
         width: min(100%, 420px);
     }
 
+    /* output jadi 1 kolom */
     .main-content .output-text.show {
         grid-template-columns: 1fr;
-    }
-
-    .main-content {
-        margin-top: 72vh;
-        padding-bottom: 18vh;
     }
 }

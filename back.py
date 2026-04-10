@@ -12,15 +12,17 @@ from groq import APIConnectionError, Groq
 import httpx
 from pydantic import BaseModel, Field
 
-load_dotenv(".env.local")
+load_dotenv(".env.local") # load API key dari file .env.local
 
-app = FastAPI()
+app = FastAPI() # buat instance FastAPI
 
+# path folder project
 BASE_DIR = Path(__file__).resolve().parent
 PUBLIC_DIR = BASE_DIR / "public"
 STATIC_DIR = PUBLIC_DIR / "static"
-IS_VERCEL = os.getenv("VERCEL") == "1"
+IS_VERCEL = os.getenv("VERCEL") == "1" # cek apakah deploy di vercel
 
+# konfigurasi CORS (biar frontend bisa akses backend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,23 +31,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# mount folder static (css, js, image)
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY") # ambil API key dari env
 
+# client HTTP untuk request ke Groq
 http_client = httpx.Client(trust_env=False, timeout=30.0)
+
+# inisialisasi client Groq
 client = Groq(api_key=GROQ_API_KEY, http_client=http_client) if GROQ_API_KEY else None
 
+# schema request dari frontend
 class TextRequest(BaseModel):
     text: str = Field(..., min_length   =1, max_length=3000)
 
+# schema response ke frontend
 class SimplifyResponse(BaseModel):
     original_text: str
     simplified_text: str
     message: str
 
-
+# buat prompt untuk AI
 def build_prompt(text: str) -> str:
     return f"""
 You are an accessibility assistant.
@@ -67,7 +75,7 @@ Text:
 {text}
 """.strip()
 
-
+# fungsi utama simplify text
 def simplify_text(text: str) -> str:
     clean_text = text.strip()
 
@@ -79,6 +87,7 @@ def simplify_text(text: str) -> str:
 
     prompt = build_prompt(clean_text)
 
+    # request ke model AI
     response = client.chat.completions.create(
         messages=[
             {
@@ -101,7 +110,7 @@ def simplify_text(text: str) -> str:
 
     return result.strip()
 
-
+# route halaman utama
 @app.get("/", include_in_schema=False)
 def index():
     if IS_VERCEL:
@@ -109,7 +118,7 @@ def index():
 
     return FileResponse(PUBLIC_DIR / "index.html")
 
-
+# route health check
 @app.get("/health")
 def health_check():
     return {
@@ -117,7 +126,7 @@ def health_check():
         "service": "ai-simplifier-backend",
     }
 
-
+# endpoint utama simplify
 @app.post("/simplify", response_model=SimplifyResponse)
 def simplify(req: TextRequest):
     try:
