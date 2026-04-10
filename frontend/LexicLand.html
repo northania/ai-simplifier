@@ -26,7 +26,7 @@
 
                 <div>
                     <nav>
-                        <a href="#try">Try It</a>
+                        <a href="#try" onclick="scrollToTryIt(event)">Try It</a>
                     </nav>
                 </div>
             </div>
@@ -83,6 +83,39 @@
         function autoResize(textarea) {
             textarea.style.height = "auto";
             textarea.style.height = textarea.scrollHeight + "px";
+        }
+
+        function getHeaderOffset() {
+            const header = document.querySelector("header");
+            return header ? header.offsetHeight : 0;
+        }
+
+        function scrollElementIntoComfortView(element, extraOffset = 0) {
+            if (!element) {
+                return;
+            }
+
+            const headerOffset = getHeaderOffset();
+            const elementRect = element.getBoundingClientRect();
+            const elementTop = window.scrollY + elementRect.top;
+            const elementHeight = elementRect.height;
+            const viewportHeight = window.innerHeight;
+            const usableHeight = viewportHeight - headerOffset;
+
+            const centeredTop = elementTop - headerOffset - Math.max((usableHeight - elementHeight) / 2, 24);
+            const targetTop = Math.max(centeredTop - extraOffset, 0);
+
+            window.scrollTo({
+                top: targetTop,
+                behavior: "smooth"
+            });
+        }
+
+        function scrollToTryIt(event) {
+            event.preventDefault();
+
+            const section = document.getElementById("try");
+            scrollElementIntoComfortView(section, 20);
         }
 
         function syncResultHeights() {
@@ -176,10 +209,7 @@
 
             const outputBox = document.querySelector(".output-text");
             outputBox.classList.add("show");
-
-            document.getElementById("result").scrollIntoView({
-                behavior: "smooth"
-            });
+            scrollElementIntoComfortView(document.querySelector(".input-text"), 12);
 
             try {
                 const response = await fetch("/simplify", {
@@ -200,6 +230,9 @@
                 autoResize(afterText);
                 syncResultHeights();
                 setTtsStatus("Simplified text is ready to read aloud.");
+                setTimeout(() => {
+                    scrollElementIntoComfortView(document.getElementById("result"), 8);
+                }, 120);
             }
             catch (error) {
                 console.error(error);
@@ -207,6 +240,9 @@
                 autoResize(afterText);
                 syncResultHeights();
                 setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
+                setTimeout(() => {
+                    scrollElementIntoComfortView(document.getElementById("result"), 8);
+                }, 120);
             }
         }
 
