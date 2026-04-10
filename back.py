@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from groq import APIConnectionError, Groq
@@ -101,10 +102,12 @@ def simplify_text(text: str) -> str:
     return result.strip()
 
 
-if not IS_VERCEL:
-    @app.get("/", include_in_schema=False)
-    def index():
-        return FileResponse(PUBLIC_DIR / "index.html")
+@app.get("/", include_in_schema=False)
+def index():
+    if IS_VERCEL:
+        return RedirectResponse("/index.html", status_code=307)
+
+    return FileResponse(PUBLIC_DIR / "index.html")
 
 
 @app.get("/health")
