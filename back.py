@@ -32,13 +32,8 @@ if STATIC_DIR.exists():
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-if not GROQ_API_KEY:
-    raise RuntimeError(
-        "GROQ_API_KEY is not set. Please add it to your .env.local file."
-    )
-
 http_client = httpx.Client(trust_env=False, timeout=30.0)
-client = Groq(api_key=GROQ_API_KEY, http_client=http_client)
+client = Groq(api_key=GROQ_API_KEY, http_client=http_client) if GROQ_API_KEY else None
 
 class TextRequest(BaseModel):
     text: str = Field(..., min_length   =1, max_length=3000)
@@ -76,6 +71,9 @@ def simplify_text(text: str) -> str:
 
     if not clean_text:
         raise ValueError("Text cannot be empty.")
+
+    if client is None:
+        raise RuntimeError("GROQ_API_KEY is not set.")
 
     prompt = build_prompt(clean_text)
 
