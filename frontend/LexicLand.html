@@ -85,6 +85,26 @@
             textarea.style.height = textarea.scrollHeight + "px";
         }
 
+        function syncResultHeights() {
+            const resultAreas = [
+                document.getElementById("before-text"),
+                document.getElementById("after-text")
+            ];
+
+            resultAreas.forEach((textarea) => {
+                textarea.style.height = "auto";
+            });
+
+            const tallestHeight = Math.max(
+                320,
+                ...resultAreas.map((textarea) => textarea.scrollHeight)
+            );
+
+            resultAreas.forEach((textarea) => {
+                textarea.style.height = `${tallestHeight}px`;
+            });
+        }
+
         function setTtsStatus(message) {
             document.getElementById("tts-status").innerText = message;
         }
@@ -152,6 +172,7 @@
             afterText.value = "Processing...";
             autoResize(beforeText);
             autoResize(afterText);
+            syncResultHeights();
 
             const outputBox = document.querySelector(".output-text");
             outputBox.classList.add("show");
@@ -177,12 +198,14 @@
                 const data = await response.json();
                 afterText.value = data.simplified_text;
                 autoResize(afterText);
+                syncResultHeights();
                 setTtsStatus("Simplified text is ready to read aloud.");
             }
             catch (error) {
                 console.error(error);
                 afterText.value = error.message || "Error occurred!";
                 autoResize(afterText);
+                syncResultHeights();
                 setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
             }
         }
@@ -264,6 +287,8 @@
                 window.speechSynthesis.getVoices();
             };
         }
+
+        window.addEventListener("resize", syncResultHeights);
     </script>
 </body>
 </html>
