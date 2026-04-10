@@ -90,7 +90,7 @@
             return header ? header.offsetHeight : 0;
         }
 
-        function scrollElementIntoComfortView(element, extraOffset = 0) {
+        function scrollElementIntoComfortView(element, extraOffset = 0, centerBias = 0.5) {
             if (!element) {
                 return;
             }
@@ -101,8 +101,8 @@
             const elementHeight = elementRect.height;
             const viewportHeight = window.innerHeight;
             const usableHeight = viewportHeight - headerOffset;
-
-            const centeredTop = elementTop - headerOffset - Math.max((usableHeight - elementHeight) / 2, 24);
+            const freeSpace = Math.max(usableHeight - elementHeight, 0);
+            const centeredTop = elementTop - headerOffset - (freeSpace * centerBias);
             const targetTop = Math.max(centeredTop - extraOffset, 0);
 
             window.scrollTo({
@@ -114,8 +114,8 @@
         function scrollToTryIt(event) {
             event.preventDefault();
 
-            const section = document.getElementById("try");
-            scrollElementIntoComfortView(section, 20);
+            const inputSection = document.querySelector(".input-text");
+            scrollElementIntoComfortView(inputSection, 0, 0.52);
         }
 
         function syncResultHeights() {
@@ -209,7 +209,7 @@
 
             const outputBox = document.querySelector(".output-text");
             outputBox.classList.add("show");
-            scrollElementIntoComfortView(document.querySelector(".input-text"), 12);
+            scrollElementIntoComfortView(document.querySelector(".input-text"), 0, 0.52);
 
             try {
                 const response = await fetch("/simplify", {
@@ -231,7 +231,7 @@
                 syncResultHeights();
                 setTtsStatus("Simplified text is ready to read aloud.");
                 setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), 8);
+                    scrollElementIntoComfortView(document.getElementById("result"), 0, 0.5);
                 }, 120);
             }
             catch (error) {
@@ -241,7 +241,7 @@
                 syncResultHeights();
                 setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
                 setTimeout(() => {
-                    scrollElementIntoComfortView(document.getElementById("result"), 8);
+                    scrollElementIntoComfortView(document.getElementById("result"), 0, 0.5);
                 }, 120);
             }
         }
