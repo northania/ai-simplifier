@@ -188,3 +188,58 @@ textarea::placeholder {
 .after button:hover {
     background-color: #9e968c;
 }
+
+.action-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tts-status {
+    margin-top: 12px;
+    color: #776B5D;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+@media (max-width: 960px) {
+    .content {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+
+    .content-home {
+        height: auto;
+        min-height: 100vh;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 110px;
+    }
+
+    .content-home .left-home,
+    .content-home .right-home {
+        width: 100%;
+    }
+
+    .content-home .left-home h1 {
+        font-size: 56px;
+    }
+
+    .content-home .left-home p,
+    .content-home .left-home nav a {
+        font-size: 20px;
+    }
+
+    .content-home .right-home {
+        margin-top: 10px;
+        justify-content: center;
+    }
+
+    .content-home .right-home img {
+        width: min(100%, 420px);
+    }
+
+    .main-content .output-text.show {
+        grid-template-columns: 1fr;
+    }
+}

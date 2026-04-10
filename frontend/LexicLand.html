@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexicLand - AI Simplifier for Dyslexic</title>
-    <link rel="icon" sizes="16x16" href="Group 1.png">
+    <link rel="icon" sizes="16x16" href="/frontend/Group 1.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="header.css">
-    <link rel="stylesheet" href="content.css">
+    <link rel="stylesheet" href="/frontend/header.css">
+    <link rel="stylesheet" href="/frontend/content.css">
 </head>
 <body>
     <header>
-        <img src="Group 1.png" alt="Logo LexicLand" width="60" height="65">
+        <img src="/frontend/Group 1.png" alt="Logo LexicLand" width="60" height="65">
         <div class = "menu">
-            <a href="LexicLand.html">Home</a>
+            <a href="/">Home</a>
         </div>
     </header>
     <div class="content">
@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="right-home">
-                <img src="LexicLand-Decoration.png" alt="LexicLand Decoration">
+                <img src="/frontend/LexicLand-Decoration.png" alt="LexicLand Decoration">
             </div>
         </div>
         <div class="main-content" id="try">
@@ -52,30 +52,106 @@
                 <div class="after">
                     <div class="label">After</div>
                     <textarea id="after-text" readonly></textarea>
-                    <button onclick="copyText(this)">Copy</button>
+                    <div class="action-row">
+                        <button onclick="copyText(this)">Copy</button>
+                        <button id="speakButton" onclick="toggleSpeech()">Speak</button>
+                    </div>
+                    <p id="tts-status" class="tts-status">Text-to-speech ready.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        let currentUtterance = null;
+        let isSpeaking = false;
+        const ENGLISH_MARKERS = [
+            "the", "and", "is", "are", "to", "of", "in", "for", "with", "on",
+            "this", "that", "it", "be", "as", "by", "from", "or", "an", "at"
+        ];
+        const INDONESIAN_MARKERS = [
+            "yang", "dan", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "adalah",
+            "tidak", "pada", "karena", "atau", "juga", "dalam", "akan", "bisa", "sudah", "agar"
+        ];
+
         document.querySelectorAll("textarea").forEach(textarea=> {
             textarea.addEventListener("input", function() {
-                this.style.height = "auto"; // reset
-                this.style.height = this.scrollHeight + "px"; // ikutin jumlah text
+                autoResize(this);
             });
         });
 
+        function autoResize(textarea) {
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+        }
+
+        function setTtsStatus(message) {
+            document.getElementById("tts-status").innerText = message;
+        }
+
+        function updateSpeakButton() {
+            document.getElementById("speakButton").innerText = isSpeaking ? "Stop" : "Speak";
+        }
+
+        function countLanguageMatches(words, markers) {
+            return words.reduce((total, word) => total + (markers.includes(word) ? 1 : 0), 0);
+        }
+
+        function detectDominantLanguage(text) {
+            const words = text
+                .toLowerCase()
+                .replace(/[^a-zA-Z\s]/g, " ")
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (words.length === 0) {
+                return {
+                    lang: "en-US",
+                    label: "English"
+                };
+            }
+
+            const englishScore = countLanguageMatches(words, ENGLISH_MARKERS);
+            const indonesianScore = countLanguageMatches(words, INDONESIAN_MARKERS);
+
+            if (indonesianScore > englishScore) {
+                return {
+                    lang: "id-ID",
+                    label: "Bahasa Indonesia"
+                };
+            }
+
+            return {
+                lang: "en-US",
+                label: "English"
+            };
+        }
+
+        function pickVoice(targetLang) {
+            const voices = window.speechSynthesis.getVoices();
+            return voices.find((voice) => voice.lang.toLowerCase().startsWith(targetLang.toLowerCase()));
+        }
+
         async function simplifyText() {
-            const text = document.getElementById("inputText").value;
+            const input = document.getElementById("inputText");
+            const beforeText = document.getElementById("before-text");
+            const afterText = document.getElementById("after-text");
+            const text = input.value.trim();
 
             if (!text) {
                 alert("Please enter text first!");
                 return;
             }
 
-            document.getElementById("before-text").value = text;
-            document.getElementById("after-text").value = "Processing...";
+            window.speechSynthesis.cancel();
+            isSpeaking = false;
+            updateSpeakButton();
+            setTtsStatus("Text-to-speech ready.");
+
+            beforeText.value = text;
+            afterText.value = "Processing...";
+            autoResize(beforeText);
+            autoResize(afterText);
 
             const outputBox = document.querySelector(".output-text");
             outputBox.classList.add("show");
@@ -85,7 +161,7 @@
             });
 
             try {
-                const response = await fetch("http://localhost:8000/simplify", {
+                const response = await fetch("/simplify", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -93,23 +169,100 @@
                     body: JSON.stringify({ text: text })
                 });
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || "Failed to simplify text.");
+                }
+
                 const data = await response.json();
-                document.getElementById("after-text").value = data.output;
+                afterText.value = data.simplified_text;
+                autoResize(afterText);
+                setTtsStatus("Simplified text is ready to read aloud.");
             }
             catch (error) {
                 console.error(error);
-                document.getElementById("after-text").value = "Error occured!";
+                afterText.value = error.message || "Error occurred!";
+                autoResize(afterText);
+                setTtsStatus("Text-to-speech is unavailable until simplify succeeds.");
             }
         }
 
-         function copyText(btn) {
+        function copyText(btn) {
             const afterText = document.getElementById("after-text").value;
+
+            if (!afterText || afterText === "Processing...") {
+                return;
+            }
+
             navigator.clipboard.writeText(afterText);
 
             btn.innerText = "Copied!";
             setTimeout(() => {
                 btn.innerText = "Copy";
             }, 1500);
+        }
+
+        function toggleSpeech() {
+            const output = document.getElementById("after-text").value.trim();
+
+            if (!("speechSynthesis" in window)) {
+                setTtsStatus("Your browser does not support text-to-speech.");
+                return;
+            }
+
+            if (!output || output === "Processing...") {
+                setTtsStatus("Simplify text first before using text-to-speech.");
+                return;
+            }
+
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                currentUtterance = null;
+                updateSpeakButton();
+                setTtsStatus("Speech stopped.");
+                return;
+            }
+
+            const detectedLanguage = detectDominantLanguage(output);
+            currentUtterance = new SpeechSynthesisUtterance(output);
+            currentUtterance.rate = 0.9;
+            currentUtterance.pitch = 1;
+            currentUtterance.lang = detectedLanguage.lang;
+
+            const selectedVoice = pickVoice(detectedLanguage.lang);
+            if (selectedVoice) {
+                currentUtterance.voice = selectedVoice;
+            }
+
+            currentUtterance.onstart = () => {
+                isSpeaking = true;
+                updateSpeakButton();
+                setTtsStatus(`Reading in ${detectedLanguage.label}...`);
+            };
+
+            currentUtterance.onend = () => {
+                isSpeaking = false;
+                currentUtterance = null;
+                updateSpeakButton();
+                setTtsStatus("Finished reading.");
+            };
+
+            currentUtterance.onerror = () => {
+                isSpeaking = false;
+                currentUtterance = null;
+                updateSpeakButton();
+                setTtsStatus("Text-to-speech failed. Try again.");
+            };
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(currentUtterance);
+        }
+
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
         }
     </script>
 </body>
